@@ -1,2 +1,2 @@
-# navigpspad dwa raspbery
+# navigpspad remote raspbery
 raspberry robot 

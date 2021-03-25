@@ -28,6 +28,7 @@
 #include "check_dis_module.h"
 #include "raspi_sonar.h"
 
+#include "online_client.h"
 
 #define USE_ULTRASONIC 1
 
@@ -46,13 +47,13 @@ int  main (int argc, char ** argv)
     pthread_t pthread_id = 0 ;
 	struct sched_param param;
 	/*create task thread */
-
+/*
 	pthread_attr_init (&attr);
 	pthread_attr_setschedpolicy (&attr, SCHED_RR);
 	param.sched_priority = 5;
 	pthread_attr_setschedparam (&attr, &param);
 	pthread_create (&pthread_id, &attr, IMUThread, NULL);
-	pthread_attr_destroy (&attr);
+	pthread_attr_destroy (&attr);*/
     	/*create task thread */
 	pthread_attr_init (&attr);
 	pthread_attr_setschedpolicy (&attr, SCHED_RR);
@@ -96,7 +97,20 @@ int  main (int argc, char ** argv)
 	pthread_attr_setschedparam (&attr, &param);
 	pthread_create (&pthread_id, &attr, &Mqtt_ClentTask, NULL);
 	pthread_attr_destroy (&attr);
-   
+   	  /*create task online timer   */
+	pthread_attr_init (&attr);
+	pthread_attr_setschedpolicy (&attr, SCHED_RR);
+	param.sched_priority = 5;
+	pthread_attr_setschedparam (&attr, &param);
+	pthread_create (&pthread_id, &attr, &Online_ClientTask, NULL);
+	pthread_attr_destroy (&attr);
+      	  /*create task rtmp push thread   */
+	pthread_attr_init (&attr);
+	pthread_attr_setschedpolicy (&attr, SCHED_RR);
+	param.sched_priority = 5;
+	pthread_attr_setschedparam (&attr, &param);
+	pthread_create (&pthread_id, &attr, &Rtmp_pushTask, NULL);
+	pthread_attr_destroy (&attr);
 	#ifdef USE_ULTRASONIC
 	pthread_attr_init (&attr);
 	pthread_attr_setschedpolicy (&attr, SCHED_RR);

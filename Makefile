@@ -63,6 +63,10 @@ C_SRC+=src/gps_hal.c
 C_SRC+=src/cJSON.c
 C_SRC+= src/check_dis_module.c
 C_SRC+= src/config_conf.c
+C_SRC+= src/md5.c
+
+
+
 CXX_SRC=
 CXX_SRC +=src/kalman.cpp
 CXX_SRC += src/dwa_demo.cpp
@@ -76,6 +80,7 @@ CXX_SRC+= $(CXXFILES)
 CXX_SRC +=  src/dwa.cpp
 CXX_SRC +=  src/raspi_sonar.cpp
 CXX_SRC +=  src/SimpleKalmanFilter.cpp
+CXX_SRC +=  src/online_client.cpp
 OBJ=
 DEP=
 OBJECTS_DIR   = objects/

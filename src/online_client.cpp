@@ -60,100 +60,11 @@ void get_str_md5(const char *str, char *md5_str)
 	md5_str[MD5_STR_LEN] = '\0'; // add end
 }
 
-int CreatOnlinejson()
-{
-	char tmp_buf[0xff]={0};
-	char topic_buf[0xff]={0};
-	unsigned char  value_buf[0xff]={0};
-	 char  send_buf[0xff]={0};
-
-	memcpy(topic_buf,"online",sizeof("online"));
-	
-	memset(tmp_buf,0,sizeof(tmp_buf));
-	sprintf(tmp_buf,"\"%s\"",chargename);
-
-	
-
-    cJSON * root =  cJSON_CreateObject();
-    if(!root) {
-         printf("get root faild !\n");
-     }else printf("get root success!\n");
- 
-    cJSON_AddItemToObject(root, "\"type\"", cJSON_CreateNumber(1));
-    cJSON_AddItemToObject(root, "\"sn\"", cJSON_CreateString(tmp_buf));//
-   
-  
-    memcpy(value_buf,cJSON_Print(root),strlen(cJSON_Print(root)));
-      
-	printf("value_buf %s \n",value_buf);
-
-	sprintf(send_buf,"mosquitto_pub -h  %s -t %s  -m \"%s\"",MQTT_HOSt,topic_buf,value_buf);
-
-	printf("publish:%s\n",send_buf);
-	system(send_buf);
-
-
-    cJSON_Delete(root);
-
-    return 0;
-}
 
 
 
-int CreatQrcodejson()
-{
-	char tmp_buf[0xff]={0};
-	char topic_buf[0xff]={0};
-	unsigned char  value_buf[0xff]={0};
-	 char  send_buf[0xff]={0};
-	 char md5_str[MD5_STR_LEN + 1];
-	 char md5_str_id[MD5_STR_LEN + 1];
-
-	 char md5_str_license[12];
-
-//	memcpy(topic_buf,"online",sizeof("online"));
-	 time_t cur_time;
-	struct tm *tm_buf = NULL;
-
-	time (&cur_time);
-	tm_buf = localtime (&cur_time);
-	memset (tmp_buf, 0, sizeof (tmp_buf));
-	sprintf ((char *)tmp_buf, "%d-%d-%d %02d:%02d:%02d", tm_buf->tm_year + 1900, tm_buf->tm_mon + 1, tm_buf->tm_mday, tm_buf->tm_hour, tm_buf->tm_min, tm_buf->tm_sec);
-
-	memset(md5_str_license,0,12);
-	get_str_md5((const char *)tmp_buf, md5_str);
-	memcpy(md5_str_license,md5_str,5);
-	//printf("time %s \n",md5_str);
-	
-	get_str_md5((const char *)chargename, md5_str_id);
-	//printf("id:%s-%s\n",chargename,md5_str_id);
-	memcpy(md5_str_license+5,md5_str_id,5);
-
-	
-
-	
 
 
-	sprintf(topic_buf,"{\"TIME\":\"%s\",\"SN\":\"%s\",\"LICENSE\":\"%s\"}",tmp_buf,chargename,md5_str_license);
-	//printf("value_buf %s \n",topic_buf);
-
-	//sprintf(send_buf,"echo -e \"%s\"  > qrcode.txt",topic_buf);
-	process_qrcodeText(topic_buf,strlen(topic_buf));
-	system("sudo cp qrcode.txt /usr/local/boa/qrcodejs/");
-
-
-   
-
-    return 0;
-}
-static void process_qrcodeText(const void *p, size_t length)
-{
-    FILE *save_fd  = fopen("qrcode.txt", "w");
-    fputc ('.', stdout);
-    fwrite(p, sizeof(char), length, save_fd);
-    fflush (stdout);
-    fclose(save_fd);
-}
 
 void read_json()
 {
@@ -245,26 +156,7 @@ int  parse_retcjson(char *a)
 
 }
 
-void *Online_ClientTask(void *arg)
-{
-	
 
-	/*memset(txsecreat_buf,0,0xff);
-	strcpy(txsecreat_buf,TENCENT_API_KEY);
-	strcat(txsecreat_buf,chargename);
-	strcat(txsecreat_buf,txtime);
-	printf("split:%s\n",txsecreat_buf);
-	get_str_md5((const char *)strdup(txsecreat_buf), tencent_license);
-	printf("tencent_license:%s \n",tencent_license);
-	*/
-
-	CreatQrcodejson();
-	while(1)
-		{
-			CreatOnlinejson();
-			sleep(DELAY_TIME);
-	}
-}
 
 
 void *Rtmp_pushTask(void *arg)

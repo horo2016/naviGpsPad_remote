@@ -97,13 +97,7 @@ int  main (int argc, char ** argv)
 	pthread_attr_setschedparam (&attr, &param);
 	pthread_create (&pthread_id, &attr, &Mqtt_ClentTask, NULL);
 	pthread_attr_destroy (&attr);
-   	  /*create task online timer   */
-	pthread_attr_init (&attr);
-	pthread_attr_setschedpolicy (&attr, SCHED_RR);
-	param.sched_priority = 5;
-	pthread_attr_setschedparam (&attr, &param);
-	pthread_create (&pthread_id, &attr, &Online_ClientTask, NULL);
-	pthread_attr_destroy (&attr);
+   
       	  /*create task rtmp push thread   */
 	pthread_attr_init (&attr);
 	pthread_attr_setschedpolicy (&attr, SCHED_RR);

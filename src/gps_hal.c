@@ -15,6 +15,8 @@
 #include<pthread.h>
 #include"osp_syslog.h"
 #include "gps.h"
+#include "cJSON.h"
+#include "cpu_sys.h"
 /*******************************************************************************
 * function name	: IMUThread
 * description	: heartbeat function ,if receive new data ,clear counter,or,
@@ -38,7 +40,41 @@ typedef struct
     float gpsheading;
     float gpsvelocity;
 }use_shared;
+int CreatstateGpsjson(Location gpsval,float h,float vel)
+{
+	char tmp_buf[0xff]={0};
+	char topic_buf[0xff]={0};
+	unsigned char  value_buf[0xff]={0};
+	 char  send_buf[0xff]={0};
 
+    memcpy(topic_buf,chargename,sizeof(chargename));
+	memcpy(topic_buf+strlen(chargename),"/state/gps",sizeof("/state/gps"));
+printf("topic:%s \n",topic_buf);
+
+    cJSON * root =  cJSON_CreateObject();
+  if(!root) {
+         printf("get root faild !\n");
+     }
+ //   cJSON_AddItemToObject(root, "\"type\"", cJSON_CreateNumber(0));//?ù?úµ???ìí?ó
+  //  cJSON_AddItemToObject(root, "\"devid\"", cJSON_CreateString(chargename));
+    cJSON_AddItemToObject(root, "\"isvalid\"", cJSON_CreateNumber(1));
+    cJSON_AddItemToObject(root, "\"lonti\"", cJSON_CreateNumber(gpsval.lng));//ìí?óname?úµ?
+    cJSON_AddItemToObject(root, "\"lati\"",cJSON_CreateNumber(gpsval.lat));//ìí?óname?úµ?
+    cJSON_AddItemToObject(root, "\"gpsheading\"", cJSON_CreateNumber(h));//
+    cJSON_AddItemToObject(root, "\"gpsvelocity\"",cJSON_CreateNumber(vel)); 
+   // mqtt_publish(tmp_buf,cJSON_Print(root));
+    memcpy(value_buf,cJSON_Print(root),strlen(cJSON_Print(root)));
+      
+
+	sprintf(send_buf,"mosquitto_pub -h www.woyilian.com -t %s  -m \"%s\"",topic_buf,value_buf);
+	system(send_buf);
+	// printf("%s\n", tmp_buf);
+        //printf("%s\n", publishstring.pMessage);
+
+    cJSON_Delete(root);
+
+    return 0;
+}
 void GpsHandle()
 {
 
@@ -71,11 +107,13 @@ void GpsHandle()
 		 latitude = shared->gpsInf.lat;
 		 longitude = shared->gpsInf.lng; 
 		shared->isvalid  =0;
+		CreatstateGpsjson(shared->gpsInf,shared->gpsheading,shared->gpsvelocity);
 	 	}else{
 			 DEBUG(LOG_DEBUG,"gps data read invalid no receive  \n");
 		}
 	  // longitude = 116.293532;
 	  // latitude =40.151789;
+	   
 	   usleep(980000);
 			 
 
@@ -85,7 +123,7 @@ void GpsHandle()
 		fprintf(stderr, "shmdt failed\n");
 		exit(EXIT_FAILURE);
 	}
-	//ɾ�������ڴ�
+	//É¾³ý¹²ÏíÄÚ´æ
 	if(shmctl(shmid, IPC_RMID, 0) == -1)
 	{
 		fprintf(stderr, "shmctl(IPC_RMID) failed\n");
@@ -94,4 +132,3 @@ void GpsHandle()
 	exit(EXIT_SUCCESS);
 	return 0;
 }
-

@@ -34,18 +34,7 @@ Contributors:
 static int mosquitto__parse_socks_url(struct mosq_config *cfg, char *url);
 static int client_config_line_proc(struct mosq_config *cfg, int pub_or_sub, int argc, char *argv[]);
 
-void init_config(struct mosq_config *cfg)
-{
-	memset(cfg, 0, sizeof(*cfg));
-	cfg->host = "www.woyilian.com";
-	cfg->topic = "test";
-	cfg->port = 1883;
-	cfg->max_inflight = 20;
-	cfg->keepalive = 60;
-	cfg->clean_session = true;
-	cfg->eol = true;
-	cfg->protocol_version = MQTT_PROTOCOL_V31;
-}
+
 
 void client_config_cleanup(struct mosq_config *cfg)
 {
@@ -92,7 +81,7 @@ void client_config_cleanup(struct mosq_config *cfg)
 #endif
 }
 
-int client_config_load(struct mosq_config *cfg, int pub_or_sub, int argc, char *argv[])
+int clientPub_config_load(struct mosq_config *cfg, int pub_or_sub,char *devid)
 {
 	int rc;
 	FILE *fptr;
@@ -109,9 +98,11 @@ int client_config_load(struct mosq_config *cfg, int pub_or_sub, int argc, char *
 #endif
 	args[0] = NULL;
 
-	init_config(cfg);
+	//init_config(cfg);
+	init_pub_config(cfg,devid);
 
 	/* Default config file */
+#if 0
 
 	env = getenv("XDG_CONFIG_HOME");
 	if(env){
@@ -179,10 +170,10 @@ int client_config_load(struct mosq_config *cfg, int pub_or_sub, int argc, char *
 		}
 		free(loc);
 	}
-
+#endif
 	/* Deal with real argc/argv */
-	rc = client_config_line_proc(cfg, pub_or_sub, argc, argv);
-	if(rc) return rc;
+	//rc = client_config_line_proc(cfg, pub_or_sub, argc, argv);
+	//if(rc) return rc;
 
 	if(cfg->will_payload && !cfg->will_topic){
 		fprintf(stderr, "Error: Will payload given, but no will topic given.\n");

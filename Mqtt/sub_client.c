@@ -86,7 +86,12 @@ static void my_message_callback(struct mosquitto *mosq, void *obj, const struct 
 		if(message->payloadlen){
 			//printf("topic:%s ", message->topic);
 			//printf("message:%s",message->payload);
-		    parse_cjson(message->payload);
+			if(strstr(NULL != message->payloadlen,"vel")){
+		      parse_cjson(message->payload);
+			  }
+			  else {
+			     User_MsgContl(message->payloadlen);
+			  }
 		//	fwrite(message->payload, 1, message->payloadlen, stdout);
 			if(cfg->eol){
 				printf("\n");

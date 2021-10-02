@@ -113,63 +113,42 @@ void stop_init(void)
 	signal(SIGINT, cfinish);
 	signal(SIGTERM, cfinish);
 }
-#if 0
-void User_MsgCtl(MQTT_USER_MSG  *msg)
+
+void User_MsgContl(char  *msg)
 {
-	char tmp_value[36];
-	switch(msg->msgqos)
-	{
-		case 0:
-			printf("MQTT>>消息质量: QoS0\n");
-			break;
-		case 1:
-			printf("MQTT>>消息质量: QoS1\n");
-			break;
-		case 2:
-			printf("MQTT>>消息质量: QoS2\n");
-			break;
-		default:
-			printf("MQTT>>error quantity\n");
-			break;
-	}
-	printf("MQTT>>msg topic %s\r\n",msg->topic);	
-	printf("MQTT>>msg: %s\r\n",msg->msg);	
-	printf("MQTT>>msg length: %d\r\n",msg->msglenth);	 
-#ifdef _LOCAL_SERVER	
-      if( get_value_from_cmdline((char *)msg->msg,RUNFORWARD,tmp_value )==0){
+ 
+	char tmp_value[0xff]={0};
+      if( get_value_from_cmdline((char *)msg,RUNFORWARD,tmp_value )==0){
             printf("runforward %d \n",atoi(tmp_value));
 			GLOBAL_STATUS = MOVE_STATUS;
 			MoveDistance(atoi(tmp_value));
 	}
-      else  if( get_value_from_cmdline((char *)msg->msg,TURNROUND,tmp_value )==0)
+      else  if( get_value_from_cmdline((char *)msg,TURNROUND,tmp_value )==0)
 	{
 	   GLOBAL_STATUS = MANUAL_STATUS;
            RotateDegreesByManual(atoi(tmp_value));
 	} 
-	    else  if( get_value_from_cmdline((char *)msg->msg,AVOIDANCE,tmp_value )==0)
+	    else  if( get_value_from_cmdline((char *)msg,AVOIDANCE,tmp_value )==0)
 	{
 	        GLOBAL_STATUS = MANUAL_STATUS;
 			MoveDistanceDwa(atoi(tmp_value));
 			
                // system("sudo ./dwa_control ");
-	}else  if( get_value_from_cmdline((char *)msg->msg,"start",tmp_value )==0)
+	}else  if( get_value_from_cmdline((char *)msg,"start",tmp_value )==0)
 	{
            GLOBAL_STATUS = STANDBY_STATUS;
 	   GLOBAL_SWITCH = 1;
-	}else  if( get_value_from_cmdline((char *)msg->msg,"stop",tmp_value )==0)
+	}else  if( get_value_from_cmdline((char *)msg,"stop",tmp_value )==0)
         {
            GLOBAL_STATUS = STOP_STATUS;
            GLOBAL_SWITCH = 0;
         }
-#else 
 
-
-#endif
 	// 处理后销毁数据
 	
-	msg->valid  = 0;
+
 }
-#endif
+
 static int GetNextPackID(void)
 {
 	 static unsigned int pubpacketid = 0;
@@ -197,15 +176,32 @@ void *Mqtt_PublishTask(void *argv)
 	stop_init();
 
 	
-	// Mqtt_ClentTask(NULL);
-
+	sleep(2);
+    mainPub(chargename);
 	while (1)
 	{
 		
+		printf("ReConnect\n");
+		sleep(3);
+	}
 
-	
+	#if 0  
+	{
+		
+
+		if (user_Client.Status == Connect){
+			Creatstatejson(heading,rollAngle,pitchAngle);
+			//printf("mqtt sensor: %s \n",send_buf);
+			if (MQTTMsgPublish(user_Client, "/update/state", QOS0, 0,
+				(unsigned char *)send_buf,strlen(send_buf)) != 0)
+			{
+				printf("<0\n");
+			}	
+			memset(send_buf,0,sizeof(send_buf));
+		}
 		sleep(1);
 	}
+	#endif
 
 	return 0;
 }

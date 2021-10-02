@@ -156,6 +156,30 @@ int load_stdin(void)
 
 	return 0;
 }
+void init_pub_config(struct mosq_config *cfg,char *devid)
+{
+	
+
+	char tmpBuf[0xff]={0};
+	memset(tmpBuf,0,255);
+    sprintf(tmpBuf,"%s/update/state",devid);
+	memset(cfg, 0, sizeof(*cfg));
+
+
+	printf("topic:%s \n",tmpBuf);
+	cfg->host = "www.woyilian.com";
+	
+	cfg->topic_count =1 ;
+	cfg->topics = realloc(cfg->topics, cfg->topic_count*sizeof(char *));
+	cfg->topics[cfg->topic_count-1] = strdup(tmpBuf);// "00000000b9065e37/download/control";//strdup(tmpBuf);//strdup(argv[i+1]);
+	
+	cfg->port = 1883;
+	cfg->max_inflight = 20;
+	cfg->keepalive = 60;
+	cfg->clean_session = true;
+	cfg->eol = true;
+	cfg->protocol_version = MQTT_PROTOCOL_V31;
+}
 
 int load_file(const char *filename)
 {
@@ -288,64 +312,24 @@ static void print_usage(void)
 	printf("\nSee http://mosquitto.org/ for more information.\n\n");
 }
 
-int mainPub(int argc, char *argv[])
+int mainPub(char *devid)
 {
 	struct mosq_config cfg;
 	struct mosquitto *mosq = NULL;
 	int rc;
-	int rc2;
-	char *buf;
-	int buf_len = 1024;
-	int buf_len_actual;
-	int read_len;
-	int pos;
+	
 
-	buf = malloc(buf_len);
-	if(!buf){
-		fprintf(stderr, "Error: Out of memory.\n");
-		return 1;
-	}
 
 	memset(&cfg, 0, sizeof(struct mosq_config));
-	rc = client_config_load(&cfg, CLIENT_PUB, argc, argv);
+	rc = clientPub_config_load(&cfg, CLIENT_PUB, devid);
 	if(rc){
 		client_config_cleanup(&cfg);
-		if(rc == 2){
-			/* --help */
-			print_usage();
-		}else{
-			fprintf(stderr, "\nUse 'mosquitto_pub --help' to see usage.\n");
-		}
+
 		return 1;
 	}
 
-	topic = cfg.topic;
-	message = cfg.message;
-	msglen = cfg.msglen;
-	qos = cfg.qos;
-	retain = cfg.retain;
-	mode = cfg.pub_mode;
-	username = cfg.username;
-	password = cfg.password;
-	quiet = cfg.quiet;
 
-	if(cfg.pub_mode == MSGMODE_STDIN_FILE){
-		if(load_stdin()){
-			fprintf(stderr, "Error loading input from stdin.\n");
-			return 1;
-		}
-	}else if(cfg.file_input){
-		if(load_file(cfg.file_input)){
-			fprintf(stderr, "Error loading input file \"%s\".\n", cfg.file_input);
-			return 1;
-		}
-	}
 
-	if(!topic || mode == MSGMODE_NONE){
-		fprintf(stderr, "Error: Both topic and message must be supplied.\n");
-		print_usage();
-		return 1;
-	}
 
 
 	mosquitto_lib_init();
@@ -354,7 +338,7 @@ int mainPub(int argc, char *argv[])
 		return 1;
 	}
 
-	mosq = mosquitto_new(cfg.id, true, NULL);
+	mosq = mosquitto_new(cfg.id, true, &cfg);
 	if(!mosq){
 		switch(errno){
 			case ENOMEM:
@@ -379,7 +363,7 @@ int mainPub(int argc, char *argv[])
 	}
 	rc = client_connect(mosq, &cfg);
 	if(rc) return rc;
-
+#if 0
 	if(mode == MSGMODE_STDIN_LINE){
 		mosquitto_loop_start(mosq);
 	}
@@ -431,13 +415,7 @@ int mainPub(int argc, char *argv[])
 		}
 	}while(rc == MOSQ_ERR_SUCCESS && connected);
 
-	if(mode == MSGMODE_STDIN_LINE){
-		mosquitto_loop_stop(mosq, false);
-	}
-
-	if(message && mode == MSGMODE_FILE){
-		free(message);
-	}
+#endif	
 	mosquitto_destroy(mosq);
 	mosquitto_lib_cleanup();
 

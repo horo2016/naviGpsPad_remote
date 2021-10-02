@@ -9,8 +9,7 @@ extern "C" {
 extern void *Mqtt_ClentTask(void *argv);
 extern void *Mqtt_PublishTask(void *argv);
 
-
-
+extern void User_MsgContl(char * msg);
 
 #ifdef __cplusplus
 }

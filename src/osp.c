@@ -47,13 +47,13 @@ int  main (int argc, char ** argv)
     pthread_t pthread_id = 0 ;
 	struct sched_param param;
 	/*create task thread */
-/*
+
 	pthread_attr_init (&attr);
 	pthread_attr_setschedpolicy (&attr, SCHED_RR);
 	param.sched_priority = 5;
 	pthread_attr_setschedparam (&attr, &param);
 	pthread_create (&pthread_id, &attr, IMUThread, NULL);
-	pthread_attr_destroy (&attr);*/
+	pthread_attr_destroy (&attr);
     	/*create task thread */
 	pthread_attr_init (&attr);
 	pthread_attr_setschedpolicy (&attr, SCHED_RR);
@@ -97,14 +97,15 @@ int  main (int argc, char ** argv)
 	pthread_attr_setschedparam (&attr, &param);
 	pthread_create (&pthread_id, &attr, &Mqtt_ClentTask, NULL);
 	pthread_attr_destroy (&attr);
-   
+   	  /*create task online timer   */
+
       	  /*create task rtmp push thread   */
-	pthread_attr_init (&attr);
+/*	pthread_attr_init (&attr);
 	pthread_attr_setschedpolicy (&attr, SCHED_RR);
 	param.sched_priority = 5;
 	pthread_attr_setschedparam (&attr, &param);
 	pthread_create (&pthread_id, &attr, &Rtmp_pushTask, NULL);
-	pthread_attr_destroy (&attr);
+	pthread_attr_destroy (&attr);*/
 	#ifdef USE_ULTRASONIC
 	pthread_attr_init (&attr);
 	pthread_attr_setschedpolicy (&attr, SCHED_RR);

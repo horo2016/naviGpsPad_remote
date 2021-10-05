@@ -162,8 +162,9 @@ void *Mqtt_ClentTask(void *argv)
 	while (1)
 	{
 		
-		printf("ReConnect\n");
+		printf("mainSub ReConnect\n");
 		sleep(3);
+		mainSub(chargename);
 	}
 
 

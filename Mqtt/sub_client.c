@@ -84,13 +84,13 @@ static void my_message_callback(struct mosquitto *mosq, void *obj, const struct 
 		//fflush(stdout);
 	}else{
 		if(message->payloadlen){
-			//printf("topic:%s ", message->topic);
-			//printf("message:%s",message->payload);
-			if(strstr(NULL != message->payloadlen,"vel")){
+			printf("topic:%s ", message->topic);
+			printf("message:%s",message->payload);
+			if(NULL != strstr(message->payload,"vel")){
 		      parse_cjson(message->payload);
 			  }
 			  else {
-			     User_MsgContl(message->payloadlen);
+			     User_MsgContl(message->payload);
 			  }
 		//	fwrite(message->payload, 1, message->payloadlen, stdout);
 			if(cfg->eol){
@@ -157,8 +157,12 @@ void init_sub_config(struct mosq_config *cfg,char *devid)
 
 
 	printf("topic:%s \n",tmpBuf);
+#if defined MQTT_REMOTE_SERVER 
 	cfg->host = "www.woyilian.com";
-	
+#elif defined MQTT_TERMINAL_SERVER
+    cfg->host = "127.0.0.1";
+#endif
+	printf("MQTT server:%s \n",cfg->host);
 	cfg->topic_count =1 ;
 	cfg->topics = realloc(cfg->topics, cfg->topic_count*sizeof(char *));
 	cfg->topics[cfg->topic_count-1] = strdup(tmpBuf);// "00000000b9065e37/download/control";//strdup(tmpBuf);//strdup(argv[i+1]);

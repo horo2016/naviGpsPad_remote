@@ -52,7 +52,7 @@ void get_velocity(KalmanFilter f, double* delta_lat, double* delta_lon);
 
 /* Extract a bearing from a velocity2d Kalman filter.
    0 = north, 90 = east, 180 = south, 270 = west */
-double get_bearing(KalmanFilter f);
+double get_bearing(double LatFrom, double LonFrom, double LatTo, double LonTo);
 
 ///* Convert a lat, long, delta lat, and delta long into mph.*/
 //double calculate_mph(double lat, double lon,

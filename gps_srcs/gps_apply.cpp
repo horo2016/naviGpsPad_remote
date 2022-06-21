@@ -121,7 +121,40 @@ void get_velocity(KalmanFilter f, double* delta_lat, double* delta_lon) {
   *delta_lat = f.state_estimate.data[2][0] / (1000.0 * 1000.0);
   *delta_lon = f.state_estimate.data[3][0] / (1000.0 * 1000.0);
 }
+/* See
+   http://www.movable-type.co.uk/scripts/latlong.html
+   for formulas */
+double get_bearing(double LatFrom, double LonFrom, double LatTo, double LonTo) {
+  double lat, lon, delta_lon, x, y,lat_end;
+   
 
+  /* Convert to radians */
+  double to_radians = PI / 180.0;
+  lat  =LatFrom* to_radians;
+  lat_end = LatTo* to_radians;
+  
+  lon  =LonFrom* to_radians;
+  delta_lon= LonTo* to_radians; -LonFrom* to_radians;
+   
+   
+  
+  /* Do math */
+   
+  y = sin(delta_lon) * cos(lat_end);
+  x = cos(lat) * sin(lat_end) - sin(lat1) * cos(lat_end) * cos(delta_lon);
+  double bearing = atan2(y, x);
+
+  /* Convert to degrees */
+  bearing = bearing / to_radians;
+  while (bearing >= 360.0) {
+    bearing -= 360.0;
+  }
+  while (bearing < 0.0) {
+    bearing += 360.0;
+  }
+    
+  return bearing;
+}
 /* See
    http://www.movable-type.co.uk/scripts/latlong.html
    for formulas */

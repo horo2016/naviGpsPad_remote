@@ -2,6 +2,7 @@
 
 #include <math.h>
 #include "gps_apply.h"
+#include "gps_hal.h"
 
 const double EARTHR = 6371000.8;
 
@@ -124,7 +125,8 @@ void get_velocity(KalmanFilter f, double* delta_lat, double* delta_lon) {
 /* See
    http://www.movable-type.co.uk/scripts/latlong.html
    for formulas */
-double get_bearing(double LatFrom, double LonFrom, double LatTo, double LonTo) {
+double get_bearing(double LatFrom, double LonFrom, double LatTo, double LonTo)
+{
   double lat, lon, delta_lon, x, y,lat_end;
    
 
@@ -249,4 +251,38 @@ double get_distance(double LatFrom, double LonFrom, double LatTo, double LonTo)
 	Distance = atan2(sqrt(Temp1 + Temp2) , Temp3);
 	Distance = EARTHR*Distance;
 	return Distance;
+}
+
+Location myGps_filter(double Lat, double Lon,float gpsSpeed,float gpsBearing,float imuHeading,int *fusion_heading)
+{
+
+	 Location gps_filter;
+
+   static char first_init =0,Location last_gps;
+	 if(first_init ==0)
+	 {
+			first_init =1;
+			last_gps.lat = gps_filter.lat = Lat;
+			last_gps.lng = gps_filter.lng = Lon;
+			 *fusion_heading = imuHeading;
+			return gps_filter;
+	 }
+    if(gpsSpeed <0.4 || gpsSpeed >0.8 || gpsBearing == 0)
+		{
+		    gps_filter = last_gps;
+				*fusion_heading = imuHeading;
+				return gps_filter;
+		}
+	 	double l_dist = get_distance(last_gps.lat,last_gps.lng,Lat,Lon);
+	  double l_bearing = get_bearing(last_gps.lat, last_gps.lng,Lat,Lon);
+	/*	if(  gpsBearing == 0)
+		{
+				gps_filter = last_gps;
+				return gps_filter;
+		}*/
+		last_gps.lat = gps_filter.lat = Lat;
+		last_gps.lng = gps_filter.lng = Lon;
+	return gps_filter;
+
+		
 }

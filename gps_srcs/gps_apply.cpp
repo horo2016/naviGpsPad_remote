@@ -253,7 +253,7 @@ double get_distance(double LatFrom, double LonFrom, double LatTo, double LonTo)
 	return Distance;
 }
 
-Location myGps_filter(double Lat, double Lon,float gpsSpeed,float gpsBearing,float imuHeading,int *fusion_heading)
+Location myGps_filter(double Lat, double Lon,float gpsSpeed,float gpsBearing,float imuHeading,float *fusion_heading)
 {
 
 	 Location gps_filter;

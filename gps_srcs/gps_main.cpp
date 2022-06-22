@@ -190,8 +190,9 @@ int set_opt(int fd, int nSpeed, int nBits, char nEvent, int nStop) {
 }
 
 int open_port(int fd, int comport) {
-	//char* dev[] = {"/dev/ttyS0","/dev/ttyS1","/dev/ttyUSB0"};
-	//long vdisable;
+	char serialDev[256]={0};
+	strcpy(serialDev, GPSDEVICE);
+	/*
 	if (comport == 1) {
 		fd = open("/dev/ttyAMA0", O_RDWR | O_NOCTTY | O_NDELAY);
 		if (-1 == fd) {
@@ -203,31 +204,27 @@ int open_port(int fd, int comport) {
 	}
 	else if (comport == 2) {
 		fd = open("/dev/ttyS5", O_RDWR | O_NOCTTY | O_NDELAY);
-		if (-1 == fd) {
-			perror("Can't Open Serial Port");
-			return (-1);
-		}
-		else
-			printf("open ttyS1 ......\n");
+
 	}
 	else if (comport == 3) {
 		fd = open("/dev/ttyUSB0", O_RDWR | O_NOCTTY);
-		if (-1 == fd) {
-			perror("Can't Open Serial Port");
-			return (-1);
-		}
-		else
-			printf("open ttygps ......\n");
+	
 	}
 	else if (comport == 4) {
 		fd = open("/dev/ttyACM0", O_RDWR | O_NOCTTY);
-		if (-1 == fd) {
-			perror("Can't Open Serial Port");
-			return (-1);
-		}
-		else
-			printf("open ttygps ......\n");
+	
+	
+	}*/
+	
+	fd = open(serialDev, O_RDWR | O_NOCTTY | O_NDELAY);
+	if (-1 == fd) {
+		perror("Can't Open Serial Port");
+		return (-1);
 	}
+	else
+		printf("open ttyAMA0 %s ......\n",serialDev);
+	
+	
 	/*
 	*	Block the serial port
 	*/
@@ -440,7 +437,7 @@ int gps_task(void) {
 	double lat_filt,lon_filt,lat_filt_old = 118.0,lon_filt_old=32.0;
 	double HDOP = 3.0;
 	int numSV = 0;
-
+  double fusion_headingl;
 	time_t now;
 	struct tm *timenow;
 	struct timeval  tick;
@@ -526,6 +523,8 @@ int gps_task(void) {
 			      			printf("        \tlatf: %f\tlonf: %f\t\tHDOP:%f\tnumSV:%d\n\n", lat_filt,lon_filt,HDOP,numSV);
 			      			file1<<lat<<" "<<lon<<endl;
 			      			file2<<lat_filt<<" "<<lon_filt<<endl;
+						myGps_filter(lat_filt,lon_filt, atof(Save_Data.earthSpeed)*1.852/3.6,
+										atof(Save_Data.earthHeading),heading,&fusion_headingl);
 
 							nread = 0;
 

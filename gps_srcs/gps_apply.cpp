@@ -257,20 +257,23 @@ Location myGps_filter(double Lat, double Lon,float gpsSpeed,float gpsBearing,flo
 {
 
 	 Location gps_filter;
-
-   static char first_init =0,Location last_gps;
+   
+   static char first_init =0;
+	 static Location last_gps;
+	 static double last_imuheading,last_gpsheading;
 	 if(first_init ==0)
 	 {
 			first_init =1;
 			last_gps.lat = gps_filter.lat = Lat;
 			last_gps.lng = gps_filter.lng = Lon;
-			 *fusion_heading = imuHeading;
+			 last_imuheading = *fusion_heading = imuHeading;
+			 
 			return gps_filter;
 	 }
     if(gpsSpeed <0.4 || gpsSpeed >0.8 || gpsBearing == 0)
 		{
 		    gps_filter = last_gps;
-				*fusion_heading = imuHeading;
+				last_imuheading = *fusion_heading = imuHeading;
 				return gps_filter;
 		}
 	 	double l_dist = get_distance(last_gps.lat,last_gps.lng,Lat,Lon);
@@ -280,8 +283,13 @@ Location myGps_filter(double Lat, double Lon,float gpsSpeed,float gpsBearing,flo
 				gps_filter = last_gps;
 				return gps_filter;
 		}*/
+		double imuHeading_error = fabs(imuHeading - last_imuheading);
+		double gpsHeading_error = fabs(gpsBearing - last_gpsheading);
+		last_gpsheading = gpsBearing;
 		last_gps.lat = gps_filter.lat = Lat;
 		last_gps.lng = gps_filter.lng = Lon;
+
+		*fusion_heading =imuHeading+  imuHeading_error/(imuHeading_error + gpsHeading_error)(imuHeading-gpsBearing);
 	return gps_filter;
 
 		

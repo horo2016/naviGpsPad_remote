@@ -523,8 +523,10 @@ int gps_task(void) {
 			      			printf("        \tlatf: %f\tlonf: %f\t\tHDOP:%f\tnumSV:%d\n\n", lat_filt,lon_filt,HDOP,numSV);
 			      			file1<<lat<<" "<<lon<<endl;
 			      			file2<<lat_filt<<" "<<lon_filt<<endl;
-						myGps_filter(lat_filt,lon_filt, atof(Save_Data.earthSpeed)*1.852/3.6,
-										atof(Save_Data.earthHeading),heading,&fusion_headingl);
+						 Location loc_coor_filter=	myGps_filter(lat_filt,lon_filt, atof(Save_Data.earthSpeed)*1.852/3.6,
+							 atof(Save_Data.earthHeading),heading,&fusion_headingl);
+					        printf("        \tmylatf: %f\tmylonf: %f\t\tfusion_headingl:%f\n\n", loc_coor_filter.lat,loc_coor_filter.lng,fusion_headingl);
+
 
 							nread = 0;
 

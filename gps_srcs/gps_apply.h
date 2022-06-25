@@ -11,8 +11,8 @@
 
 #include <stdio.h>
 #include "gps_kalman.h"
+#include "coordinate_sys.h"
 
-#include "gps_hal.h"
 
 // recommended useage
 void gps_init(double noise);
@@ -63,6 +63,6 @@ double get_bearing(double LatFrom, double LonFrom, double LatTo, double LonTo);
 //double get_mph(KalmanFilter f);
 
 double get_distance(double LatFrom, double LonFrom, double LatTo, double LonTo);
-Location myGps_filter(double Lat, double Lon,float gpsSpeed,float gpsBearing,float imuHeading,int *fusion_heading);
+extern Location myGps_filter(double Lat, double Lon,float gpsSpeed,float gpsBearing,float imuHeading,float *fusion_heading);
 
 #endif

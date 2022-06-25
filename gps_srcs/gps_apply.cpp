@@ -2,7 +2,7 @@
 
 #include <math.h>
 #include "gps_apply.h"
-#include "gps_hal.h"
+#include "coordinate_sys.h"
 
 const double EARTHR = 6371000.8;
 
@@ -143,7 +143,7 @@ double get_bearing(double LatFrom, double LonFrom, double LatTo, double LonTo)
   /* Do math */
    
   y = sin(delta_lon) * cos(lat_end);
-  x = cos(lat) * sin(lat_end) - sin(lat1) * cos(lat_end) * cos(delta_lon);
+  x = cos(lat) * sin(lat_end) - sin(lat) * cos(lat_end) * cos(delta_lon);
   double bearing = atan2(y, x);
 
   /* Convert to degrees */
@@ -289,7 +289,8 @@ Location myGps_filter(double Lat, double Lon,float gpsSpeed,float gpsBearing,flo
 		last_gps.lat = gps_filter.lat = Lat;
 		last_gps.lng = gps_filter.lng = Lon;
 
-		*fusion_heading =imuHeading+  imuHeading_error/(imuHeading_error + gpsHeading_error)(imuHeading-gpsBearing);
+    float k=imuHeading_error/(imuHeading_error + gpsHeading_error);
+		*fusion_heading =imuHeading+  k*(imuHeading-gpsBearing);
 	return gps_filter;
 
 		

@@ -9,6 +9,8 @@ CXX_OPTS = -DOPEN_CPUDETECT_PTHREAD #-DWITH_OPENCV #-DMPU_DEBUGOFF  OPEN_STM32_P
 #CXX_OPTS += -DMQTT_REMOTE_SERVER 
 #是否将终端作为mqtt server 
 CXX_OPTS +=-DMQTT_TERMINAL_SERVER
+#GPS 的串口号
+CXX_OPTS +=-DGPSDEVICE=\"/dev/ttyS5\"
 RTIMULIBPATH  = ./RTIMULib
 
 CFLAGS  += -g -pthread -Wall 
@@ -73,7 +75,7 @@ C_SRC+= $(FILES)
 C_SRC+=src/socket_tcp.c
 C_SRC+=src/stm32_control.c
 C_SRC+=src/Uart_comm.c
-C_SRC+=src/gps_hal.c 
+
 C_SRC+=src/cJSON.c
 C_SRC+= src/config_conf.c
 C_SRC+= src/md5.c

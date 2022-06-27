@@ -245,7 +245,7 @@ int open_port(int fd, int comport) {
 	return fd;
 }
 
-int Creatstatejson(Location gpsval,float h,float vel)
+int Creatstatejson(Location gpsval,float h,float vel,float fusionheading)
 {
 	char tmp_buf[0xff]={0};
 	char topic_buf[0xff]={0};
@@ -270,6 +270,7 @@ int Creatstatejson(Location gpsval,float h,float vel)
     cJSON_AddItemToObject(root, "\"pitch\"",cJSON_CreateNumber((short)pitchAngle));
     cJSON_AddItemToObject(root, "\"cpuload\"", cJSON_CreateNumber((char)cpuPercentage));
     cJSON_AddItemToObject(root, "\"cputemp\"", cJSON_CreateNumber((char)cpuTemperature));
+		cJSON_AddItemToObject(root, "\"fusionheading\"", cJSON_CreateNumber((short)fusionheading));
   //  cJSON_AddItemToObject(root, "\"wifisignal\"", cJSON_CreateNumber(wifiSignalStrength));
   //  cJSON_AddItemToObject(root, "\"velspeed\"", cJSON_CreateNumber((int)velspeed));
   //  cJSON_AddItemToObject(root, "\"angspeed\"", cJSON_CreateNumber(angspeed));
@@ -525,12 +526,13 @@ int gps_task(void) {
 			      			file2<<lat_filt<<" "<<lon_filt<<endl;
 							 Location loc_coor_filter=	myGps_filter(lat_filt,lon_filt, atof(Save_Data.earthSpeed)*1.852/3.6,
 							 atof(Save_Data.earthHeading),heading,&fusion_headingl);
-							 printf("        \tmylatf: %f\tmylonf: %f\t\tfusion_headingl:%f\n\n", loc_coor_filter.lat,loc_coor_filter.lng,fusion_headingl);
+							 printf("        \tmylatf: %f\tmylonf: %f\t\tfusion_headingl:%f gpsheading:%f imuheading: %f\n\n", loc_coor_filter.lat,loc_coor_filter.lng
+							 	,fusion_headingl,atof(Save_Data.earthHeading)	,heading);
 
 							nread = 0;
 
-							loc_coor =  WGS84tobaidu(lon_filt,lat_filt);
-							Creatstatejson(loc_coor,atof(Save_Data.earthHeading),atof(Save_Data.earthSpeed)*1.852/3.6);	
+							loc_coor =  WGS84tobaidu(loc_coor_filter.lng,loc_coor_filter.lat);
+							Creatstatejson(loc_coor,atof(Save_Data.earthHeading),atof(Save_Data.earthSpeed)*1.852/3.6,fusion_headingl);	
 						}
 						
 							 
